@@ -1,0 +1,23 @@
+galaxy_info:
+  author: Sascha Retter
+  description: Ansible role to setup container-based systemd-services
+
+  license: GPL-3.0
+
+  min_ansible_version: 2.9
+
+  platforms:
+  - name: Debian
+    versions:
+    - buster
+    - bullseye
+  - name: Ubuntu
+    versions:
+    - bionic
+    - focal 
+
+  galaxy_tags:
+    - container
+    - systemd
+    - linux
+  
