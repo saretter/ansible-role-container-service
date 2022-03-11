@@ -1,0 +1,76 @@
+# - name: Pull container-images
+#   containers.podman.podman_image:
+#     name: "{{ item.image }}"
+#   loop:
+#     "{{ containers }}"
+
+- name: Generate service name
+  set_fact:
+    __podman_service_name: "{{ service.service_name | default(service.image_name + '-podman') }}"
+
+- name: "Pull container-image {{ service.image_name }}:{{ service.image_tag | default('latest') }} image"
+  become: true
+  become_user: root
+  podman_image:
+    name: "{{ service.image_name }}"
+    tag: "{{ service.image_tag | default('latest') }}"
+
+- name: Create volume-directories
+  file: 
+    dest: "{{ item | replace('.*:','') }}"
+    owner: root
+    group: root
+    state: directory
+    mode: 0770
+  with_items: "{{ service.volumes }}"
+  
+
+# - name: Create and start 
+#   containers.podman.podman_container:
+#       name: "{{ item.0.name }}"
+#       image: "{{ item.0.image }}"
+#       state: started
+#       detach: true
+#       exposed_ports: "{{ item.0.exposed_ports }}"
+#       ports: "{{ item.0.ports }}"
+#       volumes: "{{ item.1.hostpath }}:{{ item.1.mountpoint }}"
+#       #- hostpath: /export/name
+#       #  mountpoint: /var/www
+#       env: "{{ containers.0.env }}"
+#       # PORT: 8080
+#       # HOST: myhost.com  
+#       generate_systemd:
+#         path: /etc/systemd/system/
+#         restart_policy: always
+#         time: 120
+#   with_subelements: 
+#   - "{{ containers }}"
+#   - volumes
+
+
+- name: "Install {{ __podman_service_name }} service"
+  become: true
+  template:
+    src: "podman.service"
+    dest: '/etc/systemd/system/{{ __podman_service_name }}.service'
+  notify: "restart podman service"
+
+
+# - name: Enable and start container services
+#   systemd: 
+#     state: "started" 
+#     name: "container-{{ item.name }}" 
+#     daemon_reload: "yes"
+#     enabled: "yes"
+#   loop:
+#     "{{ containers }}"
+
+    
+- name: "Enable and start container {{ __podman_service_name }}"
+  become: true
+  become_user: root
+  systemd:
+    name: "{{ __podman_service_name }}"
+    state: started
+    enabled: true
+    daemon_reload: true

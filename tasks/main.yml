@@ -21,52 +21,8 @@
     packages:
     - podman
 
-- name: Pull container-images
-  containers.podman.podman_image:
-    name: "{{ item.image }}"
-  loop:
-    "{{ containers }}"
 
-- name: Create volume-directories
-  file: 
-    dest: "{{ item.1.hostpath }}"
-    owner: 
-    group: 
-    state: directory
-    mode: 0770
-  with_subelements:
-  - "{{ containers }}"
-  - volumes
-
-- name: Create and start 
-  containers.podman.podman_container:
-      name: "{{ item.0.name }}"
-      image: "{{ item.0.image }}"
-      state: started
-      detach: true
-      exposed_ports: "{{ item.0.exposed_ports }}"
-      ports: "{{ item.0.ports }}"
-      volumes: "{{ item.1.hostpath }}:{{ item.1.mountpoint }}"
-      #- hostpath: /export/name
-      #  mountpoint: /var/www
-      env: "{{ containers.0.env }}"
-      # PORT: 8080
-      # HOST: myhost.com  
-      generate_systemd:
-        path: /etc/systemd/system/
-        restart_policy: always
-        time: 120
-  with_subelements: 
-  - "{{ containers }}"
-  - volumes
-
-- name: Enable and start container services
-  systemd: 
-    state: "started" 
-    name: "container-{{ item.name }}" 
-    daemon_reload: "yes"
-    enabled: "yes"
-  loop:
-    "{{ containers }}"
-
-    
+- include_tasks: service.yml
+  loop: "{{ podman_services }}"
+  loop_control:
+    loop_var: service
