@@ -24,7 +24,6 @@
     mode: 0770
   with_items: "{{ service.volumes }}"
   
-
 # - name: Create and start 
 #   containers.podman.podman_container:
 #       name: "{{ item.0.name }}"
@@ -65,7 +64,6 @@
 #   loop:
 #     "{{ containers }}"
 
-    
 - name: "Enable and start container {{ __podman_service_name }}"
   become: true
   become_user: root

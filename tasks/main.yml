@@ -21,7 +21,6 @@
     packages:
     - podman
 
-
 - include_tasks: service.yml
   loop: "{{ podman_services }}"
   loop_control:
