@@ -15,14 +15,15 @@
     name: "{{ service.image_name }}"
     tag: "{{ service.image_tag | default('latest') }}"
 
-# - name: "Create volume-directories {{ item | replace(':.*','') }}"
-#   file: 
-#     dest: "{{ item | replace(':.*','') }}"
-#     owner: root
-#     group: root
-#     state: directory
-#     mode: 0770
-#   with_items: "{{ service.volumes }}"
+- name: "Create volume-directories {{ item.split(':').0 }}"
+  file: 
+    dest: "{{ item.split(':').0 }}"
+    owner: root
+    group: root
+    state: directory
+    mode: 0770
+    recurse: yes
+  loop: "{{ service.volumes }}"
   
 # - name: Create and start 
 #   containers.podman.podman_container:
