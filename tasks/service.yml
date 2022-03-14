@@ -15,9 +15,9 @@
     name: "{{ service.image_name }}"
     tag: "{{ service.image_tag | default('latest') }}"
 
-- name: Create volume-directories
+- name: "Create volume-directories {{ item | replace('.*:','') }}"
   file: 
-    dest: "{{ item | replace('.*:','') }}"
+    dest: "{{ item | replace(':.*','') }}"
     owner: root
     group: root
     state: directory
