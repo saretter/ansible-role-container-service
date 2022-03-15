@@ -15,10 +15,10 @@
     name: "{{ service.image_name }}"
     tag: "{{ service.image_tag | default('latest') }}"
 
-- name: "Create volume-directories {{ item.split(':').0 }}"
+- name: "Create volume-directories"
   file: 
     dest: "{{ item.split(':').0 }}"
-    owner: root
+    owner: www-data
     group: root
     state: directory
     mode: 0770
